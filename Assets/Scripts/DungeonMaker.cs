@@ -48,7 +48,6 @@ public class DungeonMaker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         for (int i = 0; i < intersections.GetLength(0); i++)
         {
             for (int j = 0; j < intersections.GetLength(1); j++)
@@ -72,11 +71,8 @@ public class DungeonMaker : MonoBehaviour
                 {
                     if (intersections[i, j].Empty && IsAdjacent(i, j))
                     {
-                        //if (i == 12 && j == 12)
-                            //Debug.Log("HOW?");
                         toGenX.Add(i);
                         toGenY.Add(j);
-                        //GenerateIntersection(i, j);
                     }
                 }
             }
@@ -243,11 +239,9 @@ public class DungeonMaker : MonoBehaviour
                 }
             }
         }
+
         GameObject tempRoom = Instantiate(tempRooms[Random.Range(0, tempRooms.Count)]);
-        if (section.Start)
-            tempRoom.transform.position = new Vector3(x * RoomSize, 5, y * RoomSize);
-        else
-            tempRoom.transform.position = new Vector3(x * RoomSize, 0, y * RoomSize);
+        tempRoom.transform.position = new Vector3(x * RoomSize, 0, y * RoomSize);
 
     }
 
