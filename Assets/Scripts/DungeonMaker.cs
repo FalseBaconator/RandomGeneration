@@ -61,7 +61,6 @@ public class DungeonMaker : MonoBehaviour
 
         while (currentRun <= maxRuns)
         {
-            Debug.Log(intersections[12, 12].Start);
             currentRun++;
             List<int> toGenX = new List<int>();
             List<int> toGenY = new List<int>();
@@ -239,7 +238,8 @@ public class DungeonMaker : MonoBehaviour
                 }
             }
         }
-
+        if (section.Start) Debug.Log(x + "," + y);
+        if (section.Start) Debug.Log(x * RoomSize + "," + y * RoomSize);
         GameObject tempRoom = Instantiate(tempRooms[Random.Range(0, tempRooms.Count)]);
         tempRoom.transform.position = new Vector3(x * RoomSize, 0, y * RoomSize);
 
