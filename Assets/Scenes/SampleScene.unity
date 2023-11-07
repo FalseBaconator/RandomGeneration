@@ -297,7 +297,11 @@ MonoBehaviour:
   - {fileID: 5887648063668698592, guid: e738b6cee36982346a1bd620e6e18ab5, type: 3}
   - {fileID: 5887648063668698592, guid: b299858801f98424c9ce03ff54ab660a, type: 3}
   - {fileID: 5887648063668698592, guid: 7999982d994fddf4390c672661f49ee5, type: 3}
-  maxRuns: 7
+  - {fileID: 5887648063668698592, guid: c4c6a884405c1d24d9078c58a799ceee, type: 3}
+  - {fileID: 5887648063668698592, guid: f83713e6f1285764391855f26e94272e, type: 3}
+  - {fileID: 5887648063668698592, guid: 85889b836dd05824c9b690b80774ac5b, type: 3}
+  - {fileID: 5887648063668698592, guid: e830630272a1149458816c58456856db, type: 3}
+  maxRuns: 5
   RoomSize: 25
 --- !u!4 &1251228372
 Transform:
@@ -640,6 +644,10 @@ PrefabInstance:
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       propertyPath: GroundLayers.m_Bits
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4416926081852918491, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      propertyPath: m_SlopeLimit
+      value: 46
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

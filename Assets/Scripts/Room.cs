@@ -9,4 +9,10 @@ public class Room : MonoBehaviour
     public bool EastDoor;
     public bool WestDoor;
 
+    [Header("For StairCases")]
+    public bool lowerNorthDoor;
+    public bool lowerSouthDoor;
+    public bool lowerEastDoor;
+    public bool lowerWestDoor;
+
 }
