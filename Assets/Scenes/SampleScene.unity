@@ -433,7 +433,7 @@ MonoBehaviour:
   - {fileID: 5887648063668698592, guid: f83713e6f1285764391855f26e94272e, type: 3}
   - {fileID: 5887648063668698592, guid: 85889b836dd05824c9b690b80774ac5b, type: 3}
   - {fileID: 5887648063668698592, guid: e830630272a1149458816c58456856db, type: 3}
-  maxRuns: 3
+  maxRuns: 5
   RoomSize: 25
 --- !u!4 &1251228372
 Transform:

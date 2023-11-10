@@ -150,7 +150,6 @@ public class DungeonMaker : MonoBehaviour
                 {
                     if (lowerFloor[i, j].Empty && mainFloor[i, j].isStairs == false && IsAdjacent(i, j, true))
                     {
-                        //Debug.Log("TEST");
                         toGenXLower.Add(i);
                         toGenYLower.Add(j);
                     }
@@ -367,12 +366,12 @@ public class DungeonMaker : MonoBehaviour
                 if (amountOfDoorsOpen == 1)
                 {
                     int temp = Random.Range(0, 2);
-                    if (temp == 0)
+                    if (temp == 0 && !isSpaceOccupiedLower(x, y))
                     {
                         if (N && isSpaceOccupiedLower(x, y - 1) == false) LS = true;
                         if (S && isSpaceOccupiedLower(x, y + 1) == false) LN = true;
-                        if (E && isSpaceOccupiedLower(x + 1, y) == false) LW = true;
-                        if (W && isSpaceOccupiedLower(x - 1, y) == false) LE = true;
+                        if (E && isSpaceOccupiedLower(x - 1, y) == false) LW = true;
+                        if (W && isSpaceOccupiedLower(x + 1, y) == false) LE = true;
                     }
                 }
             }
@@ -385,6 +384,7 @@ public class DungeonMaker : MonoBehaviour
             else
             {
                 mainFloor[x, y] = new Intersection(N, S, E, W, LN, LS, LE, LW, false, false);
+                StairCheck(x, y);
             }
         }
         else //Lower Floor
@@ -499,6 +499,17 @@ public class DungeonMaker : MonoBehaviour
             }
         }
 
+    }
+
+    public void StairCheck(int x, int y)
+    {
+        if (mainFloor[x,y].isStairs)
+        {
+            if (mainFloor[x, y].LNorthDoor) GenerateIntersection(x, y + 1, true);
+            else if (mainFloor[x, y].LSouthDoor) GenerateIntersection(x, y - 1, true);
+            else if (mainFloor[x, y].LEastDoor) GenerateIntersection(x + 1, y, true);
+            else if (mainFloor[x, y].LWestDoor) GenerateIntersection(x - 1, y, true);
+        }
     }
 
     bool isSpaceOccupiedLower(int x, int y)
