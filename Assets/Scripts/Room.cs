@@ -15,4 +15,6 @@ public class Room : MonoBehaviour
     public bool lowerEastDoor;
     public bool lowerWestDoor;
 
+    public bool hasGoal;
+
 }

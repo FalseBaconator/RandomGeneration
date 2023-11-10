@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DungeonMaker : MonoBehaviour
 {
@@ -14,6 +15,19 @@ public class DungeonMaker : MonoBehaviour
     public int maxRuns;
 
     public float RoomSize;
+
+    List<Intersection> possibleGoals;
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void ResetGame()
+    {
+        Debug.Log("RESET");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
 
     struct Intersection
     {
@@ -29,6 +43,7 @@ public class DungeonMaker : MonoBehaviour
         public bool Empty;
         public bool isLower;
         public bool isStairs;
+        public bool isGoal;
 
         public Intersection(bool N, bool S, bool E, bool W, bool LN, bool LS, bool LE, bool LW, bool start, bool lower)
         {
@@ -48,6 +63,7 @@ public class DungeonMaker : MonoBehaviour
                 isStairs = true;
             }
             else isStairs = false;
+            isGoal = false;
         }
 
         public Intersection(bool empty)
@@ -64,6 +80,21 @@ public class DungeonMaker : MonoBehaviour
             Empty = empty;
             isLower = false;
             isStairs = false;
+            isGoal = false;
+        }
+
+        public int GetDoorCount()
+        {
+            int count = 0;
+            if (NorthDoor) count++;
+            if (SouthDoor) count++;
+            if (EastDoor) count++;
+            if (WestDoor) count++;
+            if (LNorthDoor) count++;
+            if (LSouthDoor) count++;
+            if (LEastDoor) count++;
+            if (LWestDoor) count++;
+            return count;
         }
 
     }
@@ -71,6 +102,8 @@ public class DungeonMaker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        possibleGoals = new List<Intersection>();
+        Time.timeScale = 1;
         for (int i = 0; i < mainFloor.GetLength(0); i++)
         {
             for (int j = 0; j < mainFloor.GetLength(1); j++)
@@ -117,7 +150,7 @@ public class DungeonMaker : MonoBehaviour
                 {
                     if (lowerFloor[i, j].Empty && mainFloor[i, j].isStairs == false && IsAdjacent(i, j, true))
                     {
-                        Debug.Log("TEST");
+                        //Debug.Log("TEST");
                         toGenXLower.Add(i);
                         toGenYLower.Add(j);
                     }
@@ -143,7 +176,57 @@ public class DungeonMaker : MonoBehaviour
                 if (!lowerFloor[i, j].Empty) lowerRooms++;
             }
         }
-        Debug.Log(lowerRooms);
+        //Debug.Log(lowerRooms);
+
+        //Place Goal
+        //How Many Viable Rooms
+        int count = 0;
+        for (int i = 0; i < mainFloor.GetLength(0); i++)
+        {
+            for (int j = 0; j < mainFloor.GetLength(1); j++)
+            {
+                if (mainFloor[i, j].GetDoorCount() == 1) count++;
+                if (lowerFloor[i, j].GetDoorCount() == 1) count++;
+            }
+        }
+        //Pick One of Said Rooms if there are enough
+        Debug.Log("Count: " + count);
+        if (count == 0) ResetGame();
+        int Index = Random.Range(0, count-1);
+        //Assign the chosen room as goal
+        for (int i = 0; i < mainFloor.GetLength(0); i++)
+        {
+            for (int j = 0; j < mainFloor.GetLength(1); j++)
+            {
+                if (mainFloor[i, j].GetDoorCount() == 1)
+                {
+                    if (Index == 0)
+                    {
+                        mainFloor[i, j].isGoal = true;
+                        Debug.Log(mainFloor[i, j].isGoal);
+                    }
+                    Index--;
+                }
+            }
+        }
+        if(Index > 0)
+        {
+            for (int i = 0; i < lowerFloor.GetLength(0); i++)
+            {
+                for (int j = 0; j < lowerFloor.GetLength(1); j++)
+                {
+                    if (lowerFloor[i, j].GetDoorCount() == 1)
+                    {
+                        if (Index == 0)
+                        {
+                            lowerFloor[i, j].isGoal = true;
+                            Debug.Log(lowerFloor[i, j].isGoal);
+                        }
+                        Index--;
+                    }
+                }
+            }
+        }
 
         //Generate Rooms
         for (int i = 0; i < mainFloor.GetLength(0); i++)
@@ -167,6 +250,11 @@ public class DungeonMaker : MonoBehaviour
             }
         }
 
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.N)) ResetGame();
     }
 
     void GenerateIntersection(int x, int y, bool isLower)
@@ -266,26 +354,29 @@ public class DungeonMaker : MonoBehaviour
                 W = false;
             }
 
+            int amountOfDoorsOpen = 0;
+            if (N) amountOfDoorsOpen++;
+            if (S) amountOfDoorsOpen++;
+            if (E) amountOfDoorsOpen++;
+            if (W) amountOfDoorsOpen++;
+
             //Determine Stairs
             if (currentRun < maxRuns && lowerFloor[x, y].Empty)
             {
-                int amountOfDoorsOpen = 0;
-                if (N) amountOfDoorsOpen++;
-                if (S) amountOfDoorsOpen++;
-                if (E) amountOfDoorsOpen++;
-                if (W) amountOfDoorsOpen++;
+                //stairs
                 if (amountOfDoorsOpen == 1)
                 {
-                    int temp = Random.Range(0, 1);
+                    int temp = Random.Range(0, 2);
                     if (temp == 0)
                     {
-                        if (N) LS = true;
-                        if (S) LN = true;
-                        if (E) LW = true;
-                        if (W) LE = true;
+                        if (N && isSpaceOccupiedLower(x, y - 1) == false) LS = true;
+                        if (S && isSpaceOccupiedLower(x, y + 1) == false) LN = true;
+                        if (E && isSpaceOccupiedLower(x + 1, y) == false) LW = true;
+                        if (W && isSpaceOccupiedLower(x - 1, y) == false) LE = true;
                     }
                 }
             }
+
 
             if (!N && !S && !E && !W && !LN && !LS && !LE && !LW)
             {
@@ -301,7 +392,7 @@ public class DungeonMaker : MonoBehaviour
             //Determine North
             if (y < 24)
             {
-                if (lowerFloor[x, y + 1].Empty && mainFloor[x, y+1].isStairs == false)
+                if (isSpaceOccupiedLower(x, y + 1) == false)
                 {
                     int temp = Random.Range(0, 2);
                     if (currentRun < maxRuns)
@@ -326,7 +417,7 @@ public class DungeonMaker : MonoBehaviour
             //Determine South
             if (y > 0)
             {
-                if (lowerFloor[x, y - 1].Empty && mainFloor[x, y+1].isStairs == false)
+                if (isSpaceOccupiedLower(x, y - 1) == false)
                 {
                     int temp = Random.Range(0, 2);
                     if (currentRun < maxRuns)
@@ -340,7 +431,7 @@ public class DungeonMaker : MonoBehaviour
                 }
                 else
                 {
-                    S = mainFloor[x, y + 1].LNorthDoor;
+                    S = mainFloor[x, y - 1].LNorthDoor;
                 }
             }
             else
@@ -351,7 +442,7 @@ public class DungeonMaker : MonoBehaviour
             //Determine East
             if (x < 24)
             {
-                if (lowerFloor[x + 1, y].Empty && mainFloor[x+1, y].isStairs == false)
+                if (isSpaceOccupiedLower(x + 1, y) == false)
                 {
                     int temp = Random.Range(0, 2);
                     if (currentRun < maxRuns)
@@ -376,7 +467,7 @@ public class DungeonMaker : MonoBehaviour
             //Determine West
             if (x > 0)
             {
-                if (lowerFloor[x - 1, y].Empty && mainFloor[x - 1, y].isStairs == false)
+                if (isSpaceOccupiedLower(x - 1, y) == false)
                 {
                     int temp = Random.Range(0, 2);
                     if (currentRun < maxRuns)
@@ -408,6 +499,13 @@ public class DungeonMaker : MonoBehaviour
             }
         }
 
+    }
+
+    bool isSpaceOccupiedLower(int x, int y)
+    {
+        if (!lowerFloor[x, y].Empty) return true;
+        if (mainFloor[x, y].isStairs) return true;
+        return false;
     }
 
     bool IsAdjacent(int x, int y, bool isLower)
@@ -483,7 +581,8 @@ public class DungeonMaker : MonoBehaviour
                                     {
                                         if(room.lowerWestDoor == section.LWestDoor)
                                         {
-                                            tempRooms.Add(obj);
+                                            if(room.hasGoal == section.isGoal)
+                                                tempRooms.Add(obj);
                                         }
                                     }
                                 }
